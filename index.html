@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>かな 퀴즈</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F6F2;
+    --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.1);
+    --border-med: rgba(0,0,0,0.18);
+    --text-primary: #1A1A18;
+    --text-secondary: #6B6A64;
+    --text-tertiary: #ADAG9F;
+    --blue-fill: #E6F1FB;
+    --blue-border: #378ADD;
+    --blue-dark: #0C447C;
+    --blue-mid: #185FA5;
+    --green-fill: #EAF3DE;
+    --green-border: #639922;
+    --green-dark: #27500A;
+    --red-fill: #FCEBEB;
+    --red-border: #E24B4A;
+    --red-dark: #791F1F;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  .screen { display: none; width: 100%; max-width: 560px; }
+  .screen.active { display: block; }
+
+  /* ── 시작 화면 ── */
+  .start-logo {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .start-logo .jp { font-size: 52px; letter-spacing: 6px; line-height: 1; }
+  .start-logo .sub { font-size: 14px; color: var(--text-secondary); margin-top: 8px; letter-spacing: 1px; }
+
+  .section-label {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--text-tertiary); margin-bottom: 10px;
+  }
+
+  .select-group { margin-bottom: 1.5rem; }
+
+  .toggle-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  }
+  .toggle-btn {
+    padding: 14px 8px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--text-primary);
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .toggle-btn .jp-label { font-size: 22px; display: block; margin-bottom: 4px; }
+  .toggle-btn .ko-label { font-size: 13px; color: var(--text-secondary); }
+  .toggle-btn.selected {
+    background: var(--blue-fill);
+    border-color: var(--blue-mid);
+    color: var(--blue-dark);
+  }
+  .toggle-btn.selected .ko-label { color: var(--blue-mid); }
+
+  .level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .level-card {
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .level-card .lv-num { font-size: 11px; color: var(--text-tertiary); letter-spacing: 1px; margin-bottom: 6px; }
+  .level-card .lv-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .level-card .lv-desc { font-size: 12px; color: var(--text-secondary); }
+  .level-card.selected {
+    background: var(--blue-fill);
+    border-color: var(--blue-mid);
+  }
+  .level-card.selected .lv-num { color: var(--blue-mid); }
+  .level-card.selected .lv-name { color: var(--blue-dark); }
+
+  .start-btn {
+    width: 100%; padding: 15px;
+    border-radius: 10px;
+    border: none;
+    background: var(--text-primary);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: opacity 0.15s;
+  }
+  .start-btn:hover { opacity: 0.85; }
+  .start-btn:disabled { opacity: 0.3; cursor: default; }
+
+  /* ── 공통 퀴즈 헤더 ── */
+  .quiz-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+  .quiz-header-left { display: flex; align-items: center; gap: 8px; }
+  .badge {
+    font-size: 12px; padding: 3px 10px; border-radius: 6px; font-weight: 500;
+    background: var(--blue-fill); color: var(--blue-dark);
+  }
+  .badge.green { background: var(--green-fill); color: var(--green-dark); }
+  .header-sub { font-size: 14px; color: var(--text-secondary); }
+  .score-label { font-size: 13px; color: var(--text-secondary); }
+
+  .progress-bg {
+    height: 5px; background: rgba(0,0,0,0.08); border-radius: 99px;
+    overflow: hidden; margin-bottom: 1.25rem;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 99px; transition: width 0.3s;
+    background: var(--blue-border);
+  }
+  .progress-fill.green { background: var(--green-border); }
+
+  /* ── 레벨 1: 빈칸 채우기 ── */
+  .col-headers {
+    display: flex; gap: 4px; padding-left: 42px; margin-bottom: 4px;
+  }
+  .col-h {
+    width: 54px; text-align: center; font-size: 11px; color: var(--text-tertiary);
+  }
+  .table-area { display: flex; flex-direction: column; gap: 4px; }
+  .table-row { display: flex; gap: 4px; align-items: center; }
+  .row-lbl {
+    width: 38px; font-size: 11px; color: var(--text-secondary);
+    text-align: center; flex-shrink: 0;
+  }
+  .kana-cell {
+    width: 54px; height: 54px;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    font-size: 20px; position: relative;
+    flex-shrink: 0;
+  }
+  .kana-cell .romaji { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
+  .blank-inactive {
+    background: var(--blue-fill); border: 1.5px solid #85B7EB;
+    color: var(--blue-mid); opacity: 0.5;
+  }
+  .blank-active {
+    background: var(--blue-fill); border: 2px solid var(--blue-mid);
+    color: var(--blue-dark);
+  }
+  .blank-done {
+    background: var(--green-fill); border: 1.5px solid var(--green-border);
+    color: var(--green-dark);
+  }
+  .blank-wrong {
+    background: var(--red-fill); border: 1.5px solid var(--red-border);
+    color: var(--red-dark);
+  }
+  .num-badge {
+    position: absolute; top: 2px; right: 4px;
+    font-size: 12px; font-weight: 800; line-height: 1;
+    color: var(--blue-mid);
+  }
+  .num-badge.done { color: var(--green-dark); }
+  .num-badge.inactive { color: #85B7EB; }
+
+  /* ── 레벨 2: 단어 읽기 ── */
+  .word-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  .word-type-badge {
+    display: inline-block; font-size: 11px; padding: 2px 10px;
+    border-radius: 6px; margin-bottom: 12px;
+    background: var(--bg); color: var(--text-secondary);
+    border: 0.5px solid var(--border);
+  }
+  .word-display { font-size: 48px; letter-spacing: 4px; font-weight: 400; margin-bottom: 6px; }
+  .word-hint { font-size: 13px; color: var(--text-tertiary); }
+
+  /* ── 공통: 보기 버튼 ── */
+  .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .choice-btn {
+    padding: 13px 8px;
+    border-radius: 8px;
+    border: 0.5px solid var(--border-med);
+    background: var(--surface);
+    color: var(--text-primary);
+    font-size: 20px;
+    cursor: pointer;
+    transition: background 0.1s;
+    line-height: 1.3;
+  }
+  .choice-btn.lv2 { font-size: 15px; }
+  .choice-btn:hover { background: var(--bg); }
+  .choice-btn.correct { background: var(--green-fill); border-color: var(--green-border); color: var(--green-dark); }
+  .choice-btn.wrong   { background: var(--red-fill);   border-color: var(--red-border);   color: var(--red-dark); }
+  .choice-btn.reveal  { background: var(--green-fill); border-color: var(--green-border); color: var(--green-dark); }
+
+  .question-text {
+    font-size: 14px; color: var(--text-secondary);
+    margin: 1.25rem 0 10px;
+  }
+  .feedback {
+    font-size: 14px; min-height: 20px; margin-top: 0.75rem;
+  }
+  .meaning-box {
+    font-size: 13px; color: var(--text-secondary); margin-top: 6px;
+  }
+  .meaning-box span { color: var(--text-primary); font-weight: 500; }
+
+  .bottom-row {
+    display: flex; justify-content: flex-end; align-items: center;
+    margin-top: 1rem;
+  }
+  .next-btn {
+    padding: 9px 20px; border-radius: 8px;
+    border: 0.5px solid var(--border-med);
+    background: var(--surface); cursor: pointer;
+    font-size: 14px; color: var(--text-primary);
+    display: none;
+  }
+  .next-btn:hover { background: var(--bg); }
+
+  /* ── 결과 화면 ── */
+  .result-wrap { text-align: center; padding: 2rem 0; }
+  .result-score { font-size: 56px; font-weight: 500; letter-spacing: -1px; margin-bottom: 4px; }
+  .result-total { font-size: 16px; color: var(--text-secondary); margin-bottom: 8px; }
+  .result-comment { font-size: 15px; color: var(--text-secondary); margin-bottom: 2rem; }
+  .result-actions { display: flex; gap: 10px; justify-content: center; }
+  .btn-outline {
+    padding: 11px 22px; border-radius: 8px;
+    border: 0.5px solid var(--border-med);
+    background: var(--surface); cursor: pointer;
+    font-size: 14px; color: var(--text-primary);
+  }
+  .btn-outline:hover { background: var(--bg); }
+  .btn-solid {
+    padding: 11px 22px; border-radius: 8px;
+    border: none;
+    background: var(--text-primary); cursor: pointer;
+    font-size: 14px; color: #fff;
+  }
+  .btn-solid:hover { opacity: 0.85; }
+
+  /* ── 뒤로가기 ── */
+  .back-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 13px; color: var(--text-tertiary);
+    padding: 0; margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .back-btn:hover { color: var(--text-secondary); }
+</style>
+</head>
+<body>
+
+<!-- ── 시작 화면 ── -->
+<div id="screen-start" class="screen active">
+  <div class="start-logo">
+    <div class="jp">かな</div>
+    <div class="sub">히라가나 · 가타카나 퀴즈</div>
+  </div>
+
+  <div class="select-group">
+    <div class="section-label">문자 선택</div>
+    <div class="toggle-row">
+      <button class="toggle-btn" id="btn-hira" onclick="selectKana('hira')">
+        <span class="jp-label">あ</span>
+        <span class="ko-label">히라가나</span>
+      </button>
+      <button class="toggle-btn" id="btn-kata" onclick="selectKana('kata')">
+        <span class="jp-label">ア</span>
+        <span class="ko-label">가타카나</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="select-group">
+    <div class="section-label">단계 선택</div>
+    <div class="level-grid">
+      <div class="level-card" id="btn-lv1" onclick="selectLevel(1)">
+        <div class="lv-num">LEVEL 1</div>
+        <div class="lv-name">빈칸 채우기</div>
+        <div class="lv-desc">오십음도에서 빈칸을 찾아라</div>
+      </div>
+      <div class="level-card" id="btn-lv2" onclick="selectLevel(2)">
+        <div class="lv-num">LEVEL 2</div>
+        <div class="lv-name">단어 읽기</div>
+        <div class="lv-desc">단어를 보고 발음을 맞혀라</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="start-btn" id="start-btn" disabled onclick="startQuiz()">시작하기</button>
+</div>
+
+<!-- ── 레벨 1 화면 ── -->
+<div id="screen-lv1" class="screen">
+  <button class="back-btn" onclick="goHome()">← 처음으로</button>
+  <div class="quiz-header">
+    <div class="quiz-header-left">
+      <span class="badge" id="lv1-badge">히라가나</span>
+      <span class="header-sub">빈칸 채우기</span>
+    </div>
+    <span class="score-label" id="lv1-score">0 / 8</span>
+  </div>
+  <div class="progress-bg"><div class="progress-fill" id="lv1-pbar" style="width:0%"></div></div>
+
+  <div class="col-headers" id="lv1-col-headers"></div>
+  <div class="table-area" id="lv1-table"></div>
+
+  <p class="question-text" id="lv1-question"></p>
+  <div class="choices-grid" id="lv1-choices"></div>
+  <div class="feedback" id="lv1-feedback"></div>
+  <div class="meaning-box" id="lv1-meaning" style="display:none"></div>
+  <div class="bottom-row">
+    <button class="next-btn" id="lv1-next" onclick="lv1Next()">다음 →</button>
+  </div>
+</div>
+
+<!-- ── 레벨 2 화면 ── -->
+<div id="screen-lv2" class="screen">
+  <button class="back-btn" onclick="goHome()">← 처음으로</button>
+  <div class="quiz-header">
+    <div class="quiz-header-left">
+      <span class="badge green" id="lv2-badge">히라가나</span>
+      <span class="header-sub">단어 읽기</span>
+    </div>
+    <span class="score-label" id="lv2-score">0 / 8</span>
+  </div>
+  <div class="progress-bg"><div class="progress-fill green" id="lv2-pbar" style="width:0%"></div></div>
+
+  <div class="word-card">
+    <div class="word-type-badge" id="lv2-type-badge">히라가나</div>
+    <div class="word-display" id="lv2-word"></div>
+    <div class="word-hint" id="lv2-hint"></div>
+  </div>
+
+  <p class="question-text">이 단어의 발음으로 맞는 것은?</p>
+  <div class="choices-grid" id="lv2-choices"></div>
+  <div class="feedback" id="lv2-feedback"></div>
+  <div class="meaning-box" id="lv2-meaning" style="display:none"></div>
+  <div class="bottom-row">
+    <button class="next-btn" id="lv2-next" onclick="lv2Next()">다음 →</button>
+  </div>
+</div>
+
+<!-- ── 결과 화면 ── -->
+<div id="screen-result" class="screen">
+  <div class="result-wrap">
+    <div class="result-score" id="result-score"></div>
+    <div class="result-total" id="result-total"></div>
+    <div class="result-comment" id="result-comment"></div>
+    <div class="result-actions">
+      <button class="btn-outline" onclick="goHome()">처음으로</button>
+      <button class="btn-solid" onclick="retryQuiz()">다시하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 데이터 ──
+const HIRA_ROWS = [
+  { label:'あ행', cells:['あ','い','う','え','お'], roman:['a','i','u','e','o'] },
+  { label:'か행', cells:['か','き','く','け','こ'], roman:['ka','ki','ku','ke','ko'] },
+  { label:'さ행', cells:['さ','し','す','せ','そ'], roman:['sa','shi','su','se','so'] },
+  { label:'た행', cells:['た','ち','つ','て','と'], roman:['ta','chi','tsu','te','to'] },
+  { label:'な행', cells:['な','に','ぬ','ね','の'], roman:['na','ni','nu','ne','no'] },
+  { label:'は행', cells:['は','ひ','ふ','へ','ほ'], roman:['ha','hi','fu','he','ho'] },
+  { label:'ま행', cells:['ま','み','む','め','も'], roman:['ma','mi','mu','me','mo'] },
+  { label:'や행', cells:['や','','ゆ','','よ'], roman:['ya','','yu','','yo'] },
+  { label:'ら행', cells:['ら','り','る','れ','ろ'], roman:['ra','ri','ru','re','ro'] },
+  { label:'わ행', cells:['わ','','を','','ん'], roman:['wa','','wo','','n'] },
+];
+const KATA_ROWS = [
+  { label:'ア행', cells:['ア','イ','ウ','エ','オ'], roman:['a','i','u','e','o'] },
+  { label:'カ행', cells:['カ','キ','ク','ケ','コ'], roman:['ka','ki','ku','ke','ko'] },
+  { label:'サ행', cells:['サ','シ','ス','セ','ソ'], roman:['sa','shi','su','se','so'] },
+  { label:'タ행', cells:['タ','チ','ツ','テ','ト'], roman:['ta','chi','tsu','te','to'] },
+  { label:'ナ행', cells:['ナ','ニ','ヌ','ネ','ノ'], roman:['na','ni','nu','ne','no'] },
+  { label:'ハ행', cells:['ハ','ヒ','フ','ヘ','ホ'], roman:['ha','hi','fu','he','ho'] },
+  { label:'マ행', cells:['マ','ミ','ム','メ','モ'], roman:['ma','mi','mu','me','mo'] },
+  { label:'ヤ행', cells:['ヤ','','ユ','','ヨ'], roman:['ya','','yu','','yo'] },
+  { label:'ラ행', cells:['ラ','リ','ル','レ','ロ'], roman:['ra','ri','ru','re','ro'] },
+  { label:'ワ행', cells:['ワ','','ヲ','','ン'], roman:['wa','','wo','','n'] },
+];
+
+// ── 구글 시트 설정 ──
+const SHEET_ID  = '1F-MzECDTU_S_6lR6_FJLpXOAih4Kg1SjHTCUeqgzOqo';
+const SHEET_NAME = 'Kana_Quiz';
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+
+// 전체 단어 풀 (시트에서 로드)
+let ALL_HIRA_WORDS = [];
+let ALL_KATA_WORDS = [];
+let wordsLoaded = false;
+
+const TOTAL_BLANKS = 8;
+const TOTAL_WORDS  = 10; // 한 세션에 출제할 단어 수
+
+// ── 상태 ──
+let selectedKana = null, selectedLevel = null;
+let lv1Blanks = [], lv1Current = 0, lv1Score = 0, lv1Answered = false;
+let lv2Order  = [], lv2Current = 0, lv2Score = 0, lv2Answered = false;
+let lv2Words  = []; // 이번 세션 단어 목록
+let currentRows = [], currentAllChars = [];
+
+// ── CSV 파싱 ──
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  const rows = [];
+  for (const line of lines) {
+    const cols = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { inQ = !inQ; }
+      else if (line[i] === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+      else { cur += line[i]; }
+    }
+    cols.push(cur.trim());
+    rows.push(cols);
+  }
+  return rows;
+}
+
+async function loadWords() {
+  if (wordsLoaded) return true;
+  try {
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error('fetch failed');
+    const text = await res.text();
+    const rows = parseCSV(text);
+    // 헤더 행 제거 (단어, 로마자, 한국어 읽기, 뜻, 분류)
+    for (let i = 1; i < rows.length; i++) {
+      const [word, reading, kor_reading, meaning, type] = rows[i];
+      if (!word || !reading || !type) continue;
+      const entry = { word, reading, meaning: meaning || '', hint: kor_reading || '' };
+      if (type.includes('히라가나')) ALL_HIRA_WORDS.push(entry);
+      else if (type.includes('가타카나')) ALL_KATA_WORDS.push(entry);
+    }
+    wordsLoaded = true;
+    return true;
+  } catch(e) {
+    console.error('단어 로드 실패:', e);
+    return false;
+  }
+}
+
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
+
+function showLoading(msg) {
+  document.getElementById('start-btn').disabled = true;
+  document.getElementById('start-btn').textContent = msg;
+}
+function hideLoading() {
+  document.getElementById('start-btn').textContent = '시작하기';
+  checkStartReady();
+}
+
+// ── 시작화면 ──
+function selectKana(k) {
+  selectedKana = k;
+  document.getElementById('btn-hira').classList.toggle('selected', k === 'hira');
+  document.getElementById('btn-kata').classList.toggle('selected', k === 'kata');
+  checkStartReady();
+}
+function selectLevel(lv) {
+  selectedLevel = lv;
+  document.getElementById('btn-lv1').classList.toggle('selected', lv === 1);
+  document.getElementById('btn-lv2').classList.toggle('selected', lv === 2);
+  checkStartReady();
+}
+function checkStartReady() {
+  document.getElementById('start-btn').disabled = !(selectedKana && selectedLevel);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goHome() { showScreen('screen-start'); }
+
+async function startQuiz() {
+  if (selectedLevel === 2) {
+    showLoading('단어 불러오는 중...');
+    const ok = await loadWords();
+    hideLoading();
+    if (!ok || (selectedKana === 'hira' ? ALL_HIRA_WORDS : ALL_KATA_WORDS).length === 0) {
+      alert('단어를 불러오지 못했습니다. 구글 시트 공유 설정을 확인해주세요.');
+      return;
+    }
+    initLv2();
+  } else {
+    initLv1();
+  }
+}
+async function retryQuiz() {
+  if (selectedLevel === 2) {
+    showLoading('단어 불러오는 중...');
+    const ok = await loadWords();
+    hideLoading();
+    if (!ok) return;
+    initLv2();
+  } else {
+    initLv1();
+  }
+}
+
+// ── 레벨 1 ──
+function initLv1() {
+  currentRows = selectedKana === 'hira' ? HIRA_ROWS : KATA_ROWS;
+  currentAllChars = currentRows.flatMap(r => r.cells).filter(c => c !== '');
+
+  const flat = currentRows.flatMap((r, ri) =>
+    r.cells.map((c, ci) => ({ ri, ci, char: c }))
+  ).filter(x => x.char !== '');
+
+  lv1Blanks   = shuffle(flat).slice(0, TOTAL_BLANKS);
+  lv1Current  = 0;
+  lv1Score    = 0;
+  lv1Answered = false;
+
+  const kanaLabel = selectedKana === 'hira' ? '히라가나' : '가타카나';
+  document.getElementById('lv1-badge').textContent = kanaLabel;
+  document.getElementById('lv1-score').textContent = `0 / ${TOTAL_BLANKS}`;
+  document.getElementById('lv1-pbar').style.width = '0%';
+
+  renderColHeaders();
+  renderLv1Table();
+  renderLv1Choices();
+  showScreen('screen-lv1');
+}
+
+function renderColHeaders() {
+  const el = document.getElementById('lv1-col-headers');
+  el.innerHTML = ['a','i','u','e','o'].map(c =>
+    `<div class="col-h">${c}</div>`
+  ).join('');
+}
+
+function renderLv1Table() {
+  const area = document.getElementById('lv1-table');
+  area.innerHTML = '';
+  currentRows.forEach((row, ri) => {
+    const rowDiv = document.createElement('div');
+    rowDiv.className = 'table-row';
+
+    const lbl = document.createElement('div');
+    lbl.className = 'row-lbl';
+    lbl.textContent = row.label;
+    rowDiv.appendChild(lbl);
+
+    row.cells.forEach((ch, ci) => {
+      const cell = document.createElement('div');
+      const bIdx = lv1Blanks.findIndex(b => b.ri === ri && b.ci === ci);
+
+      if (ch === '') {
+        cell.className = 'kana-cell';
+        cell.style.background = 'transparent';
+        cell.style.border = 'none';
+      } else if (bIdx !== -1) {
+        const num = bIdx + 1;
+        if (bIdx < lv1Current) {
+          cell.className = 'kana-cell blank-done';
+          cell.innerHTML = `${lv1Blanks[bIdx].char}<span class="num-badge done">${num}</span>`;
+        } else if (bIdx === lv1Current) {
+          cell.className = 'kana-cell blank-active';
+          cell.innerHTML = `<span style="font-size:15px;font-weight:500;">?</span><span class="num-badge">${num}</span>`;
+        } else {
+          cell.className = 'kana-cell blank-inactive';
+          cell.innerHTML = `<span style="font-size:15px;">?</span><span class="num-badge inactive">${num}</span>`;
+        }
+      } else {
+        cell.className = 'kana-cell';
+        cell.innerHTML = `${ch}<span class="romaji">${row.roman[ci]}</span>`;
+      }
+      rowDiv.appendChild(cell);
+    });
+    area.appendChild(rowDiv);
+  });
+}
+
+function renderLv1Choices() {
+  const b = lv1Blanks[lv1Current];
+  const correct = b.char;
+  const wrong = shuffle(currentAllChars.filter(c => c !== correct)).slice(0, 3);
+  const opts = shuffle([correct, ...wrong]);
+
+  const area = document.getElementById('lv1-choices');
+  area.innerHTML = '';
+  opts.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = ch;
+    btn.onclick = () => checkLv1(ch, correct, btn);
+    area.appendChild(btn);
+  });
+
+  document.getElementById('lv1-question').textContent =
+    `${lv1Current + 1}번 칸에 들어갈 문자는? (${lv1Current + 1} / ${TOTAL_BLANKS})`;
+  document.getElementById('lv1-feedback').textContent = '';
+  document.getElementById('lv1-feedback').style.color = '';
+  document.getElementById('lv1-meaning').style.display = 'none';
+  document.getElementById('lv1-next').style.display = 'none';
+  lv1Answered = false;
+}
+
+function checkLv1(chosen, correct, btn) {
+  if (lv1Answered) return;
+  lv1Answered = true;
+
+  document.querySelectorAll('#lv1-choices .choice-btn').forEach(b => {
+    if (b.textContent === correct) b.className = 'choice-btn reveal';
+  });
+
+  const fb = document.getElementById('lv1-feedback');
+  if (chosen === correct) {
+    lv1Score++;
+    btn.className = 'choice-btn correct';
+    fb.textContent = '정답!';
+    fb.style.color = '#27500A';
+  } else {
+    btn.className = 'choice-btn wrong';
+    fb.textContent = `아쉽! 정답은 "${correct}"`;
+    fb.style.color = '#791F1F';
+  }
+
+  document.getElementById('lv1-score').textContent = `${lv1Score} / ${TOTAL_BLANKS}`;
+  document.getElementById('lv1-pbar').style.width = `${((lv1Current + 1) / TOTAL_BLANKS) * 100}%`;
+
+  const activeCell = document.querySelector('.blank-active');
+  if (activeCell) {
+    activeCell.className = 'kana-cell ' + (chosen === correct ? 'blank-done' : 'blank-wrong');
+    const badge = activeCell.querySelector('.num-badge');
+    if (badge) badge.className = 'num-badge done';
+    const q = activeCell.querySelector('span:first-child');
+    if (q) q.textContent = correct;
+  }
+
+  if (lv1Current < TOTAL_BLANKS - 1) {
+    document.getElementById('lv1-next').style.display = 'block';
+  } else {
+    setTimeout(() => showResult(lv1Score, TOTAL_BLANKS), 800);
+  }
+}
+
+function lv1Next() {
+  lv1Current++;
+  renderLv1Table();
+  renderLv1Choices();
+}
+
+// ── 레벨 2 ──
+function initLv2() {
+  const pool = selectedKana === 'hira' ? ALL_HIRA_WORDS : ALL_KATA_WORDS;
+  // 풀에서 랜덤 TOTAL_WORDS개 뽑기
+  lv2Words   = shuffle([...pool]).slice(0, TOTAL_WORDS);
+  lv2Order   = lv2Words.map((_, i) => i);
+  lv2Current = 0;
+  lv2Score   = 0;
+  lv2Answered = false;
+
+  const kanaLabel = selectedKana === 'hira' ? '히라가나' : '가타카나';
+  document.getElementById('lv2-badge').textContent = kanaLabel;
+  document.getElementById('lv2-score').textContent = `0 / ${TOTAL_WORDS}`;
+  document.getElementById('lv2-pbar').style.width = '0%';
+
+  renderLv2Question();
+  showScreen('screen-lv2');
+}
+
+function renderLv2Question() {
+  const pool = selectedKana === 'hira' ? ALL_HIRA_WORDS : ALL_KATA_WORDS;
+  const w = lv2Words[lv2Order[lv2Current]];
+
+  document.getElementById('lv2-type-badge').textContent = selectedKana === 'hira' ? '히라가나' : '가타카나';
+  document.getElementById('lv2-word').textContent = w.word;
+  document.getElementById('lv2-hint').textContent = w.hint ? `(${w.hint})` : '';
+  document.getElementById('lv2-feedback').textContent = '';
+  document.getElementById('lv2-feedback').style.color = '';
+  document.getElementById('lv2-meaning').style.display = 'none';
+  document.getElementById('lv2-next').style.display = 'none';
+  lv2Answered = false;
+
+  // 오답 3개: 풀에서 정답 제외하고 랜덤 뽑기
+  const correct = w.reading;
+  const wrongPool = pool.filter(x => x.reading !== correct);
+  const wrongOpts = shuffle(wrongPool).slice(0, 3).map(x => x.reading);
+  const opts = shuffle([correct, ...wrongOpts]);
+
+  const area = document.getElementById('lv2-choices');
+  area.innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn lv2';
+    btn.textContent = opt;
+    btn.onclick = () => checkLv2(opt, correct, w.meaning, btn);
+    area.appendChild(btn);
+  });
+}
+
+function checkLv2(chosen, correct, meaning, btn) {
+  if (lv2Answered) return;
+  lv2Answered = true;
+
+  document.querySelectorAll('#lv2-choices .choice-btn').forEach(b => {
+    if (b.textContent === correct) b.className = 'choice-btn lv2 reveal';
+  });
+
+  const fb = document.getElementById('lv2-feedback');
+  if (chosen === correct) {
+    lv2Score++;
+    btn.className = 'choice-btn lv2 correct';
+    fb.textContent = '정답!';
+    fb.style.color = '#27500A';
+  } else {
+    btn.className = 'choice-btn lv2 wrong';
+    fb.textContent = `아쉽! 정답은 "${correct}"`;
+    fb.style.color = '#791F1F';
+  }
+
+  const mbox = document.getElementById('lv2-meaning');
+  mbox.innerHTML = `뜻: <span>${meaning}</span>`;
+  mbox.style.display = 'block';
+
+  document.getElementById('lv2-score').textContent = `${lv2Score} / ${TOTAL_WORDS}`;
+  document.getElementById('lv2-pbar').style.width = `${((lv2Current + 1) / TOTAL_WORDS) * 100}%`;
+
+  if (lv2Current < TOTAL_WORDS - 1) {
+    document.getElementById('lv2-next').style.display = 'block';
+  } else {
+    setTimeout(() => showResult(lv2Score, TOTAL_WORDS), 800);
+  }
+}
+
+function lv2Next() {
+  lv2Current++;
+  renderLv2Question();
+}
+
+// ── 결과 ──
+function showResult(score, total) {
+  const pct = score / total;
+  document.getElementById('result-score').textContent = `${score}`;
+  document.getElementById('result-total').textContent = `/ ${total} 정답`;
+  document.getElementById('result-comment').textContent =
+    pct === 1     ? '완벽해! 전부 맞혔어 🎉' :
+    pct >= 0.75   ? '잘했어! 거의 다 맞혔네' :
+    pct >= 0.5    ? '절반 이상! 조금만 더 연습하면 돼' :
+                    '다시 한번 도전해보자!';
+  showScreen('screen-result');
+}
+</script>
+</body>
+</html>
