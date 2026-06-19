@@ -360,7 +360,7 @@
   <div class="word-card">
     <div class="word-type-badge" id="lv2-type-badge">히라가나</div>
     <div class="word-display" id="lv2-word"></div>
-    <div class="word-hint" id="lv2-hint"></div>
+    <div class="word-meaning-preview" id="lv2-meaning-preview" style="font-size:15px; color:var(--text-secondary); margin-top:8px;"></div>
   </div>
 
   <p class="question-text">이 단어의 발음으로 맞는 것은?</p>
@@ -703,7 +703,7 @@ function renderLv2Question() {
 
   document.getElementById('lv2-type-badge').textContent = selectedKana === 'hira' ? '히라가나' : '가타카나';
   document.getElementById('lv2-word').textContent = w.word;
-  document.getElementById('lv2-hint').textContent = w.hint ? `(${w.hint})` : '';
+  document.getElementById('lv2-meaning-preview').textContent = w.meaning || '';
   document.getElementById('lv2-feedback').textContent = '';
   document.getElementById('lv2-feedback').style.color = '';
   document.getElementById('lv2-meaning').style.display = 'none';
@@ -748,8 +748,7 @@ function checkLv2(chosen, correct, meaning, btn) {
   }
 
   const mbox = document.getElementById('lv2-meaning');
-  mbox.innerHTML = `뜻: <span>${meaning}</span>`;
-  mbox.style.display = 'block';
+  mbox.style.display = 'none';
 
   document.getElementById('lv2-score').textContent = `${lv2Score} / ${TOTAL_WORDS}`;
   document.getElementById('lv2-pbar').style.width = `${((lv2Current + 1) / TOTAL_WORDS) * 100}%`;
