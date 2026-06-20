@@ -40,6 +40,7 @@
 
   .screen { display: none; width: 100%; max-width: 560px; }
   .screen.active { display: block; }
+  .lv1-screen.active { display: flex; }
 
   /* ── 시작 화면 ── */
   .start-logo {
@@ -163,12 +164,13 @@
   }
   .kana-cell .romaji { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
   .blank-inactive {
-    background: var(--blue-fill); border: 1.5px solid #85B7EB;
-    color: var(--blue-mid); opacity: 0.5;
+    background: #F0F6FD; border: 1px dashed #B8D4EF;
+    color: #B8D4EF; opacity: 0.6;
   }
   .blank-active {
-    background: var(--blue-fill); border: 2px solid var(--blue-mid);
+    background: #D0E8FA; border: 3px solid var(--blue-mid);
     color: var(--blue-dark);
+    box-shadow: 0 0 0 3px rgba(24,95,165,0.15);
   }
   .blank-done {
     background: var(--green-fill); border: 1.5px solid var(--green-border);
@@ -185,6 +187,39 @@
   }
   .num-badge.done { color: var(--green-dark); }
   .num-badge.inactive { color: #85B7EB; }
+
+  /* ── 레벨 1: 고정 레이아웃 ── */
+  .lv1-screen {
+    display: none;
+    flex-direction: column;
+    height: 100vh;
+    max-width: 560px;
+    width: 100%;
+    position: fixed;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+  }
+  .lv1-screen.active { display: flex; }
+  .lv1-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 1.5rem 0.5rem;
+  }
+  .lv1-bottom {
+    flex-shrink: 0;
+    background: var(--bg);
+    border-top: 0.5px solid var(--border);
+    padding: 1rem 1.5rem 1.5rem;
+  }
+  .question-prompt {
+    font-size: 15px; font-weight: 600;
+    color: var(--blue-dark);
+    background: var(--blue-fill);
+    border-left: 3px solid var(--blue-mid);
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
 
   /* ── 레벨 2: 단어 읽기 ── */
   .word-card {
@@ -322,26 +357,32 @@
 </div>
 
 <!-- ── 레벨 1 화면 ── -->
-<div id="screen-lv1" class="screen">
-  <button class="back-btn" onclick="goHome()">← 처음으로</button>
-  <div class="quiz-header">
-    <div class="quiz-header-left">
-      <span class="badge" id="lv1-badge">히라가나</span>
-      <span class="header-sub">빈칸 채우기</span>
+<div id="screen-lv1" class="screen lv1-screen">
+  <!-- 스크롤 영역: 헤더 + 표 -->
+  <div class="lv1-scroll">
+    <button class="back-btn" onclick="goHome()">← 처음으로</button>
+    <div class="quiz-header">
+      <div class="quiz-header-left">
+        <span class="badge" id="lv1-badge">히라가나</span>
+        <span class="header-sub">빈칸 채우기</span>
+      </div>
+      <span class="score-label" id="lv1-score">0 / 8</span>
     </div>
-    <span class="score-label" id="lv1-score">0 / 8</span>
+    <div class="progress-bg"><div class="progress-fill" id="lv1-pbar" style="width:0%"></div></div>
+
+    <p class="question-prompt" id="lv1-question"></p>
+
+    <div class="col-headers" id="lv1-col-headers"></div>
+    <div class="table-area" id="lv1-table"></div>
   </div>
-  <div class="progress-bg"><div class="progress-fill" id="lv1-pbar" style="width:0%"></div></div>
 
-  <div class="col-headers" id="lv1-col-headers"></div>
-  <div class="table-area" id="lv1-table"></div>
-
-  <p class="question-text" id="lv1-question"></p>
-  <div class="choices-grid" id="lv1-choices"></div>
-  <div class="feedback" id="lv1-feedback"></div>
-  <div class="meaning-box" id="lv1-meaning" style="display:none"></div>
-  <div class="bottom-row">
-    <button class="next-btn" id="lv1-next" onclick="lv1Next()">다음 →</button>
+  <!-- 하단 고정: 보기 버튼 -->
+  <div class="lv1-bottom">
+    <div class="feedback" id="lv1-feedback"></div>
+    <div class="choices-grid" id="lv1-choices"></div>
+    <div class="bottom-row">
+      <button class="next-btn" id="lv1-next" onclick="lv1Next()">다음 →</button>
+    </div>
   </div>
 </div>
 
@@ -625,7 +666,7 @@ function renderLv1Choices() {
   });
 
   document.getElementById('lv1-question').textContent =
-    `${lv1Current + 1}번 칸에 들어갈 문자는? (${lv1Current + 1} / ${TOTAL_BLANKS})`;
+    `${lv1Current + 1}번 칸에 들어갈 문자를 고르세요 (${lv1Current + 1} / ${TOTAL_BLANKS})`;
   document.getElementById('lv1-feedback').textContent = '';
   document.getElementById('lv1-feedback').style.color = '';
   document.getElementById('lv1-meaning').style.display = 'none';
