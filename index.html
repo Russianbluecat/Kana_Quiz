@@ -40,7 +40,9 @@
 
   .screen { display: none; width: 100%; max-width: 560px; }
   .screen.active { display: block; }
-  .lv1-screen.active { display: flex; }
+  /* lv1은 fixed + flex라 별도 처리 */
+  #screen-lv1 { display: none; }
+  #screen-lv1.active { display: flex; }
 
   /* ── 시작 화면 ── */
   .start-logo {
@@ -190,7 +192,6 @@
 
   /* ── 레벨 1: 고정 레이아웃 ── */
   .lv1-screen {
-    display: none;
     flex-direction: column;
     height: 100vh;
     max-width: 560px;
@@ -199,7 +200,6 @@
     top: 0; left: 50%;
     transform: translateX(-50%);
   }
-  .lv1-screen.active { display: flex; }
   .lv1-scroll {
     flex: 1;
     overflow-y: auto;
