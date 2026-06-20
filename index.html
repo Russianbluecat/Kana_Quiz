@@ -14,7 +14,7 @@
     --border-med: rgba(0,0,0,0.18);
     --text-primary: #1A1A18;
     --text-secondary: #6B6A64;
-    --text-tertiary: #ADA99F; /* 오타 수정: #ADAG9F -> #ADA99F */
+    --text-tertiary: #ADA9A0; /* FIX 1: #ADAG9F → #ADA9A0 (유효한 hex) */
     --blue-fill: #E6F1FB;
     --blue-border: #378ADD;
     --blue-dark: #0C447C;
@@ -40,15 +40,11 @@
 
   .screen { display: none; width: 100%; max-width: 560px; }
   .screen.active { display: block; }
-  /* lv1은 fixed + flex라 별도 처리 */
   #screen-lv1 { display: none; }
   #screen-lv1.active { display: flex; }
 
   /* ── 시작 화면 ── */
-  .start-logo {
-    text-align: center;
-    margin-bottom: 2.5rem;
-  }
+  .start-logo { text-align: center; margin-bottom: 2.5rem; }
   .start-logo .jp { font-size: 52px; letter-spacing: 6px; line-height: 1; }
   .start-logo .sub { font-size: 14px; color: var(--text-secondary); margin-top: 8px; letter-spacing: 1px; }
 
@@ -56,231 +52,104 @@
     font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
     color: var(--text-tertiary); margin-bottom: 10px;
   }
-
   .select-group { margin-bottom: 1.5rem; }
-
-  .toggle-row {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-  }
+  .toggle-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .toggle-btn {
-    padding: 14px 8px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    cursor: pointer;
-    font-size: 15px;
-    color: var(--text-primary);
-    text-align: center;
-    transition: all 0.15s;
+    padding: 14px 8px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface); cursor: pointer; font-size: 15px;
+    color: var(--text-primary); text-align: center; transition: all 0.15s;
   }
   .toggle-btn .jp-label { font-size: 22px; display: block; margin-bottom: 4px; }
   .toggle-btn .ko-label { font-size: 13px; color: var(--text-secondary); }
-  .toggle-btn.selected {
-    background: var(--blue-fill);
-    border-color: var(--blue-mid);
-    color: var(--blue-dark);
-  }
+  .toggle-btn.selected { background: var(--blue-fill); border-color: var(--blue-mid); color: var(--blue-dark); }
   .toggle-btn.selected .ko-label { color: var(--blue-mid); }
 
   .level-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .level-card {
-    padding: 16px;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
+    padding: 16px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface); cursor: pointer; transition: all 0.15s; text-align: left;
   }
   .level-card .lv-num { font-size: 11px; color: var(--text-tertiary); letter-spacing: 1px; margin-bottom: 6px; }
   .level-card .lv-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
   .level-card .lv-desc { font-size: 12px; color: var(--text-secondary); }
-  .level-card.selected {
-    background: var(--blue-fill);
-    border-color: var(--blue-mid);
-  }
+  .level-card.selected { background: var(--blue-fill); border-color: var(--blue-mid); }
   .level-card.selected .lv-num { color: var(--blue-mid); }
   .level-card.selected .lv-name { color: var(--blue-dark); }
 
   .start-btn {
-    width: 100%; padding: 15px;
-    border-radius: 10px;
-    border: none;
-    background: var(--text-primary);
-    color: #fff;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-top: 0.5rem;
-    transition: opacity 0.15s;
+    width: 100%; padding: 15px; border-radius: 10px; border: none;
+    background: var(--text-primary); color: #fff; font-size: 16px;
+    font-weight: 500; cursor: pointer; margin-top: 0.5rem; transition: opacity 0.15s;
   }
   .start-btn:hover { opacity: 0.85; }
   .start-btn:disabled { opacity: 0.3; cursor: default; }
 
   /* ── 공통 퀴즈 헤더 ── */
   .quiz-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 0.75rem;
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;
   }
   .quiz-header-left { display: flex; align-items: center; gap: 8px; }
-  .badge {
-    font-size: 12px; padding: 3px 10px; border-radius: 6px; font-weight: 500;
-    background: var(--blue-fill); color: var(--blue-dark);
-  }
+  .badge { font-size: 12px; padding: 3px 10px; border-radius: 6px; font-weight: 500; background: var(--blue-fill); color: var(--blue-dark); }
   .badge.green { background: var(--green-fill); color: var(--green-dark); }
   .header-sub { font-size: 14px; color: var(--text-secondary); }
   .score-label { font-size: 13px; color: var(--text-secondary); }
 
-  .progress-bg {
-    height: 5px; background: rgba(0,0,0,0.08); border-radius: 99px;
-    overflow: hidden; margin-bottom: 1.25rem;
-  }
-  .progress-fill {
-    height: 100%; border-radius: 99px; transition: width 0.3s;
-    background: var(--blue-border);
-  }
+  .progress-bg { height: 5px; background: rgba(0,0,0,0.08); border-radius: 99px; overflow: hidden; margin-bottom: 1.25rem; }
+  .progress-fill { height: 100%; border-radius: 99px; transition: width 0.3s; background: var(--blue-border); }
   .progress-fill.green { background: var(--green-border); }
 
   /* ── 레벨 1: 빈칸 채우기 ── */
-  .col-headers {
-    display: flex; gap: 4px; padding-left: 42px; margin-bottom: 4px;
-  }
-  .col-h {
-    width: 54px; text-align: center; font-size: 11px; color: var(--text-tertiary);
-  }
+  .col-headers { display: flex; gap: 4px; padding-left: 42px; margin-bottom: 4px; }
+  .col-h { width: 54px; text-align: center; font-size: 11px; color: var(--text-tertiary); }
   .table-area { display: flex; flex-direction: column; gap: 4px; }
   .table-row { display: flex; gap: 4px; align-items: center; }
-  .row-lbl {
-    width: 38px; font-size: 11px; color: var(--text-secondary);
-    text-align: center; flex-shrink: 0;
-  }
+  .row-lbl { width: 38px; font-size: 11px; color: var(--text-secondary); text-align: center; flex-shrink: 0; }
   .kana-cell {
-    width: 54px; height: 54px;
-    border: 0.5px solid var(--border);
-    border-radius: 8px;
-    background: var(--surface);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    font-size: 20px; position: relative;
-    flex-shrink: 0;
+    width: 54px; height: 54px; border: 0.5px solid var(--border); border-radius: 8px;
+    background: var(--surface); display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-size: 20px; position: relative; flex-shrink: 0;
   }
   .kana-cell .romaji { font-size: 10px; color: var(--text-tertiary); margin-top: 1px; }
-  .blank-inactive {
-    background: #F0F6FD; border: 1px dashed #B8D4EF;
-    color: #B8D4EF; opacity: 0.6;
-  }
-  .blank-active {
-    background: #D0E8FA; border: 3px solid var(--blue-mid);
-    color: var(--blue-dark);
-    box-shadow: 0 0 0 3px rgba(24,95,165,0.15);
-  }
-  .blank-done {
-    background: var(--green-fill); border: 1.5px solid var(--green-border);
-    color: var(--green-dark);
-  }
-  .blank-wrong {
-    background: var(--red-fill); border: 1.5px solid var(--red-border);
-    color: var(--red-dark);
-  }
-  .num-badge {
-    position: absolute; top: 2px; right: 4px;
-    font-size: 12px; font-weight: 800; line-height: 1;
-    color: var(--blue-mid);
-  }
+  .blank-inactive { background: #F0F6FD; border: 1px dashed #B8D4EF; color: #B8D4EF; opacity: 0.6; }
+  .blank-active { background: #D0E8FA; border: 3px solid var(--blue-mid); color: var(--blue-dark); box-shadow: 0 0 0 3px rgba(24,95,165,0.15); }
+  .blank-done { background: var(--green-fill); border: 1.5px solid var(--green-border); color: var(--green-dark); }
+  .blank-wrong { background: var(--red-fill); border: 1.5px solid var(--red-border); color: var(--red-dark); }
+  .num-badge { position: absolute; top: 2px; right: 4px; font-size: 12px; font-weight: 800; line-height: 1; color: var(--blue-mid); }
   .num-badge.done { color: var(--green-dark); }
   .num-badge.inactive { color: #85B7EB; }
 
   /* ── 레벨 1: 고정 레이아웃 ── */
-  .lv1-screen {
-    flex-direction: column;
-    height: 100vh;
-    max-width: 560px;
-    width: 100%;
-    position: fixed;
-    top: 0; left: 50%;
-    transform: translateX(-50%);
-  }
-  .lv1-scroll {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1.5rem 1.5rem 0.5rem;
-  }
-  .lv1-bottom {
-    flex-shrink: 0;
-    background: var(--bg);
-    border-top: 0.5px solid var(--border);
-    padding: 1rem 1.5rem 1.5rem;
-  }
+  .lv1-screen { flex-direction: column; height: 100vh; max-width: 560px; width: 100%; position: fixed; top: 0; left: 50%; transform: translateX(-50%); }
+  .lv1-scroll { flex: 1; overflow-y: auto; padding: 1.5rem 1.5rem 0.5rem; }
+  .lv1-bottom { flex-shrink: 0; background: var(--bg); border-top: 0.5px solid var(--border); padding: 1rem 1.5rem 1.5rem; }
   .question-prompt {
-    font-size: 15px; font-weight: 600;
-    color: var(--blue-dark);
-    background: var(--blue-fill);
-    border-left: 3px solid var(--blue-mid);
-    padding: 10px 14px;
-    border-radius: 6px;
-    margin-bottom: 12px;
+    font-size: 15px; font-weight: 600; color: var(--blue-dark);
+    background: var(--blue-fill); border-left: 3px solid var(--blue-mid);
+    padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;
   }
 
   /* ── 레벨 2: 단어 읽기 ── */
-  .word-card {
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem 1.5rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-  .word-type-badge {
-    display: inline-block; font-size: 11px; padding: 2px 10px;
-    border-radius: 6px; margin-bottom: 12px;
-    background: var(--bg); color: var(--text-secondary);
-    border: 0.5px solid var(--border);
-  }
+  .word-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: 12px; padding: 2rem 1.5rem; text-align: center; margin-bottom: 1.5rem; }
+  .word-type-badge { display: inline-block; font-size: 11px; padding: 2px 10px; border-radius: 6px; margin-bottom: 12px; background: var(--bg); color: var(--text-secondary); border: 0.5px solid var(--border); }
   .word-display { font-size: 48px; letter-spacing: 4px; font-weight: 400; margin-bottom: 6px; }
   .word-hint { font-size: 13px; color: var(--text-tertiary); }
 
   /* ── 공통: 보기 버튼 ── */
   .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .choice-btn {
-    padding: 13px 8px;
-    border-radius: 8px;
-    border: 0.5px solid var(--border-med);
-    background: var(--surface);
-    color: var(--text-primary);
-    font-size: 20px;
-    cursor: pointer;
-    transition: background 0.1s;
-    line-height: 1.3;
-  }
+  .choice-btn { padding: 13px 8px; border-radius: 8px; border: 0.5px solid var(--border-med); background: var(--surface); color: var(--text-primary); font-size: 20px; cursor: pointer; transition: background 0.1s; line-height: 1.3; }
   .choice-btn.lv2 { font-size: 15px; }
   .choice-btn:hover { background: var(--bg); }
   .choice-btn.correct { background: var(--green-fill); border-color: var(--green-border); color: var(--green-dark); }
   .choice-btn.wrong   { background: var(--red-fill);   border-color: var(--red-border);   color: var(--red-dark); }
   .choice-btn.reveal  { background: var(--green-fill); border-color: var(--green-border); color: var(--green-dark); }
 
-  .question-text {
-    font-size: 14px; color: var(--text-secondary);
-    margin: 1.25rem 0 10px;
-  }
-  .feedback {
-    font-size: 14px; min-height: 20px; margin-top: 0.75rem;
-  }
-  .meaning-box {
-    font-size: 13px; color: var(--text-secondary); margin-top: 6px;
-  }
+  .question-text { font-size: 14px; color: var(--text-secondary); margin: 1.25rem 0 10px; }
+  .feedback { font-size: 14px; min-height: 20px; margin-top: 0.75rem; }
+  .meaning-box { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
   .meaning-box span { color: var(--text-primary); font-weight: 500; }
 
-  .bottom-row {
-    display: flex; justify-content: flex-end; align-items: center;
-    margin-top: 1rem;
-  }
-  .next-btn {
-    padding: 9px 20px; border-radius: 8px;
-    border: 0.5px solid var(--border-med);
-    background: var(--surface); cursor: pointer;
-    font-size: 14px; color: var(--text-primary);
-    display: none;
-  }
+  .bottom-row { display: flex; justify-content: flex-end; align-items: center; margin-top: 1rem; }
+  .next-btn { padding: 9px 20px; border-radius: 8px; border: 0.5px solid var(--border-med); background: var(--surface); cursor: pointer; font-size: 14px; color: var(--text-primary); display: none; }
   .next-btn:hover { background: var(--bg); }
 
   /* ── 결과 화면 ── */
@@ -289,39 +158,24 @@
   .result-total { font-size: 16px; color: var(--text-secondary); margin-bottom: 8px; }
   .result-comment { font-size: 15px; color: var(--text-secondary); margin-bottom: 2rem; }
   .result-actions { display: flex; gap: 10px; justify-content: center; }
-  .btn-outline {
-    padding: 11px 22px; border-radius: 8px;
-    border: 0.5px solid var(--border-med);
-    background: var(--surface); cursor: pointer;
-    font-size: 14px; color: var(--text-primary);
-  }
+  .btn-outline { padding: 11px 22px; border-radius: 8px; border: 0.5px solid var(--border-med); background: var(--surface); cursor: pointer; font-size: 14px; color: var(--text-primary); }
   .btn-outline:hover { background: var(--bg); }
-  .btn-solid {
-    padding: 11px 22px; border-radius: 8px;
-    border: none;
-    background: var(--text-primary); cursor: pointer;
-    font-size: 14px; color: #fff;
-  }
+  .btn-solid { padding: 11px 22px; border-radius: 8px; border: none; background: var(--text-primary); cursor: pointer; font-size: 14px; color: #fff; }
   .btn-solid:hover { opacity: 0.85; }
 
   /* ── 뒤로가기 ── */
-  .back-btn {
-    background: none; border: none; cursor: pointer;
-    font-size: 13px; color: var(--text-tertiary);
-    padding: 0; margin-bottom: 1.25rem;
-    display: flex; align-items: center; gap: 4px;
-  }
+  .back-btn { background: none; border: none; cursor: pointer; font-size: 13px; color: var(--text-tertiary); padding: 0; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 4px; }
   .back-btn:hover { color: var(--text-secondary); }
 </style>
 </head>
 <body>
 
+<!-- ── 시작 화면 ── -->
 <div id="screen-start" class="screen active">
   <div class="start-logo">
     <div class="jp">かな</div>
     <div class="sub">히라가나 · 가타카나 퀴즈</div>
   </div>
-
   <div class="select-group">
     <div class="section-label">문자 선택</div>
     <div class="toggle-row">
@@ -335,7 +189,6 @@
       </button>
     </div>
   </div>
-
   <div class="select-group">
     <div class="section-label">단계 선택</div>
     <div class="level-grid">
@@ -351,10 +204,10 @@
       </div>
     </div>
   </div>
-
   <button class="start-btn" id="start-btn" disabled onclick="startQuiz()">시작하기</button>
 </div>
 
+<!-- ── 레벨 1 화면 ── -->
 <div id="screen-lv1" class="screen lv1-screen">
   <div class="lv1-scroll">
     <button class="back-btn" onclick="goHome()">← 처음으로</button>
@@ -366,13 +219,10 @@
       <span class="score-label" id="lv1-score">0 / 8</span>
     </div>
     <div class="progress-bg"><div class="progress-fill" id="lv1-pbar" style="width:0%"></div></div>
-
     <p class="question-prompt" id="lv1-question"></p>
-
     <div class="col-headers" id="lv1-col-headers"></div>
     <div class="table-area" id="lv1-table"></div>
   </div>
-
   <div class="lv1-bottom">
     <div class="feedback" id="lv1-feedback"></div>
     <div class="choices-grid" id="lv1-choices"></div>
@@ -382,6 +232,7 @@
   </div>
 </div>
 
+<!-- ── 레벨 2 화면 ── -->
 <div id="screen-lv2" class="screen">
   <button class="back-btn" onclick="goHome()">← 처음으로</button>
   <div class="quiz-header">
@@ -389,16 +240,14 @@
       <span class="badge green" id="lv2-badge">히라가나</span>
       <span class="header-sub">단어 읽기</span>
     </div>
-    <span class="score-label" id="lv2-score">0 / 8</span>
+    <span class="score-label" id="lv2-score">0 / 10</span>
   </div>
   <div class="progress-bg"><div class="progress-fill green" id="lv2-pbar" style="width:0%"></div></div>
-
   <div class="word-card">
     <div class="word-type-badge" id="lv2-type-badge">히라가나</div>
     <div class="word-display" id="lv2-word"></div>
-    <div class="word-meaning-preview" id="lv2-meaning-preview" style="font-size:15px; color:var(--text-secondary); margin-top:8px;"></div>
+    <div id="lv2-meaning-preview" style="font-size:15px; color:var(--text-secondary); margin-top:8px;"></div>
   </div>
-
   <p class="question-text">이 단어의 발음으로 맞는 것은?</p>
   <div class="choices-grid" id="lv2-choices"></div>
   <div class="feedback" id="lv2-feedback"></div>
@@ -408,6 +257,7 @@
   </div>
 </div>
 
+<!-- ── 결과 화면 ── -->
 <div id="screen-result" class="screen">
   <div class="result-wrap">
     <div class="result-score" id="result-score"></div>
@@ -427,11 +277,11 @@ const HIRA_ROWS = [
   { label:'か행', cells:['か','き','く','け','こ'], roman:['ka','ki','ku','ke','ko'] },
   { label:'さ행', cells:['さ','し','す','せ','そ'], roman:['sa','shi','su','se','so'] },
   { label:'た행', cells:['た','ち','つ','て','と'], roman:['ta','chi','tsu','te','to'] },
-  { label:'な행', cells:['な','に','ぬ','ね','노'], roman:['na','ni','nu','ne','no'] },
+  { label:'な행', cells:['な','に','ぬ','ね','の'], roman:['na','ni','nu','ne','no'] },
   { label:'は행', cells:['は','ひ','ふ','へ','ほ'], roman:['ha','hi','fu','he','ho'] },
-  { label:'ま행', cells:['ま','み','む','め','も'], roman:['ma','み','mu','me','mo'] },
+  { label:'ま행', cells:['ま','み','む','め','も'], roman:['ma','mi','mu','me','mo'] },
   { label:'や행', cells:['や','','ゆ','','よ'], roman:['ya','','yu','','yo'] },
-  { label:'ら행', cells:['ら','り','루','れ','ろ'], roman:['ra','ri','ru','re','ro'] },
+  { label:'ら행', cells:['ら','り','る','れ','ろ'], roman:['ra','ri','ru','re','ro'] },
   { label:'わ행', cells:['わ','','を','','ん'], roman:['wa','','wo','','n'] },
 ];
 const KATA_ROWS = [
@@ -447,9 +297,10 @@ const KATA_ROWS = [
   { label:'ワ행', cells:['ワ','','ヲ','','ン'], roman:['wa','','wo','','n'] },
 ];
 
-const SHEET_ID  = '1F-MzECDTU_S_6lR6_FJLpXOAih4Kg1SjHTCUeqgzOqo';
+// ── 구글 시트 설정 ──
+const SHEET_ID   = '1F-MzECDTU_S_6lR6_FJLpXOAih4Kg1SjHTCUeqgzOqo';
 const SHEET_NAME = 'Kana_Quiz';
-const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+const CSV_URL    = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
 let ALL_HIRA_WORDS = [];
 let ALL_KATA_WORDS = [];
@@ -458,22 +309,14 @@ let wordsLoaded = false;
 const TOTAL_BLANKS = 8;
 const TOTAL_WORDS  = 10;
 
+// ── 상태 ──
 let selectedKana = null, selectedLevel = null;
 let lv1Blanks = [], lv1Current = 0, lv1Score = 0, lv1Answered = false;
-let lv2Order  = [], lv2Current = 0, lv2Score = 0, lv2Answered = false;
-let lv2Words  = []; 
+let lv2Order = [], lv2Current = 0, lv2Score = 0, lv2Answered = false;
+let lv2Words = [], lv2Total = 0; // FIX 6: lv2Total로 실제 단어 수 관리
 let currentRows = [], currentAllChars = [];
 
-// Fisher-Yates 무작위 셔플 알고리즘 적용
-function shuffle(array) {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
-
+// ── CSV 파싱 ──
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const rows = [];
@@ -492,16 +335,12 @@ function parseCSV(text) {
 }
 
 async function loadWords() {
-  if (wordsLoaded) return true;
+  if (wordsLoaded) return true; // 이미 로드됐으면 바로 반환
   try {
     const res = await fetch(CSV_URL);
     if (!res.ok) throw new Error('fetch failed');
     const text = await res.text();
     const rows = parseCSV(text);
-    
-    ALL_HIRA_WORDS = [];
-    ALL_KATA_WORDS = [];
-
     for (let i = 1; i < rows.length; i++) {
       const [word, reading, kor_reading, meaning, type] = rows[i];
       if (!word || !reading || !type) continue;
@@ -517,15 +356,19 @@ async function loadWords() {
   }
 }
 
+function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
+
 function showLoading(msg) {
-  document.getElementById('start-btn').disabled = true;
-  document.getElementById('start-btn').textContent = msg;
+  const btn = document.getElementById('start-btn');
+  btn.disabled = true;
+  btn.textContent = msg;
 }
 function hideLoading() {
   document.getElementById('start-btn').textContent = '시작하기';
   checkStartReady();
 }
 
+// ── 시작화면 ──
 function selectKana(k) {
   selectedKana = k;
   document.getElementById('btn-hira').classList.toggle('selected', k === 'hira');
@@ -546,7 +389,6 @@ function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
-
 function goHome() { showScreen('screen-start'); }
 
 async function startQuiz() {
@@ -554,7 +396,8 @@ async function startQuiz() {
     showLoading('단어 불러오는 중...');
     const ok = await loadWords();
     hideLoading();
-    if (!ok || (selectedKana === 'hira' ? ALL_HIRA_WORDS : ALL_KATA_WORDS).length === 0) {
+    const pool = selectedKana === 'hira' ? ALL_HIRA_WORDS : ALL_KATA_WORDS;
+    if (!ok || pool.length === 0) {
       alert('단어를 불러오지 못했습니다. 구글 시트 공유 설정을 확인해주세요.');
       return;
     }
@@ -563,12 +406,16 @@ async function startQuiz() {
     initLv1();
   }
 }
+
+// FIX 4: retry 시 이미 로드된 경우 로딩 UI 생략
 async function retryQuiz() {
   if (selectedLevel === 2) {
-    showLoading('단어 불러오는 중...');
-    const ok = await loadWords();
-    hideLoading();
-    if (!ok) return;
+    if (!wordsLoaded) {
+      showLoading('단어 불러오는 중...');
+      const ok = await loadWords();
+      hideLoading();
+      if (!ok) return;
+    }
     initLv2();
   } else {
     initLv1();
@@ -650,8 +497,7 @@ function renderLv1Table() {
 function renderLv1Choices() {
   const b = lv1Blanks[lv1Current];
   const correct = b.char;
-  // 공백 문자 필터링 보강
-  const wrong = shuffle(currentAllChars.filter(c => c !== correct && c !== '')).slice(0, 3);
+  const wrong = shuffle(currentAllChars.filter(c => c !== correct)).slice(0, 3);
   const opts = shuffle([correct, ...wrong]);
 
   const area = document.getElementById('lv1-choices');
@@ -668,6 +514,7 @@ function renderLv1Choices() {
     `${lv1Current + 1}번 칸에 들어갈 문자를 고르세요 (${lv1Current + 1} / ${TOTAL_BLANKS})`;
   document.getElementById('lv1-feedback').textContent = '';
   document.getElementById('lv1-feedback').style.color = '';
+  // FIX 2: lv1-meaning 참조 제거 (존재하지 않는 element)
   document.getElementById('lv1-next').style.display = 'none';
   lv1Answered = false;
 }
@@ -720,15 +567,16 @@ function lv1Next() {
 // ── 레벨 2 ──
 function initLv2() {
   const pool = selectedKana === 'hira' ? ALL_HIRA_WORDS : ALL_KATA_WORDS;
-  lv2Words   = shuffle([...pool]).slice(0, Math.min(TOTAL_WORDS, pool.length));
-  lv2Order   = lv2Words.map((_, i) => i);
-  lv2Current = 0;
+  lv2Words    = shuffle([...pool]).slice(0, TOTAL_WORDS);
+  lv2Total    = lv2Words.length; // FIX 5+6: 실제 단어 수로 관리
+  lv2Order    = lv2Words.map((_, i) => i);
+  lv2Current  = 0;
   lv2Score    = 0;
   lv2Answered = false;
 
   const kanaLabel = selectedKana === 'hira' ? '히라가나' : '가타카나';
   document.getElementById('lv2-badge').textContent = kanaLabel;
-  document.getElementById('lv2-score').textContent = `0 / ${lv2Words.length}`;
+  document.getElementById('lv2-score').textContent = `0 / ${lv2Total}`; // FIX 6: lv2Total 사용
   document.getElementById('lv2-pbar').style.width = '0%';
 
   renderLv2Question();
@@ -749,17 +597,9 @@ function renderLv2Question() {
   lv2Answered = false;
 
   const correct = w.reading;
-  
-  // 고유한 발음 세트를 활용하여 중복 보기 방지 로직 고도화
-  const wrongSet = new Set();
-  const shuffledPool = shuffle(pool);
-  for (let i = 0; i < shuffledPool.length; i++) {
-    if (shuffledPool[i].reading !== correct) {
-      wrongSet.add(shuffledPool[i].reading);
-    }
-    if (wrongSet.size === 3) break;
-  }
-  const opts = shuffle([correct, ...Array.from(wrongSet)]);
+  const wrongPool = pool.filter(x => x.reading !== correct);
+  const wrongOpts = shuffle(wrongPool).slice(0, 3).map(x => x.reading);
+  const opts = shuffle([correct, ...wrongOpts]);
 
   const area = document.getElementById('lv2-choices');
   area.innerHTML = '';
@@ -792,13 +632,20 @@ function checkLv2(chosen, correct, meaning, btn) {
     fb.style.color = '#791F1F';
   }
 
-  document.getElementById('lv2-score').textContent = `${lv2Score} / ${lv2Words.length}`;
-  document.getElementById('lv2-pbar').style.width = `${((lv2Current + 1) / lv2Words.length) * 100}%`;
+  // FIX 3: meaning이 있을 때 실제로 표시
+  if (meaning) {
+    const mbox = document.getElementById('lv2-meaning');
+    mbox.innerHTML = `뜻: <span>${meaning}</span>`;
+    mbox.style.display = 'block';
+  }
 
-  if (lv2Current < lv2Words.length - 1) {
+  document.getElementById('lv2-score').textContent = `${lv2Score} / ${lv2Total}`;
+  document.getElementById('lv2-pbar').style.width = `${((lv2Current + 1) / lv2Total) * 100}%`;
+
+  if (lv2Current < lv2Total - 1) {
     document.getElementById('lv2-next').style.display = 'block';
   } else {
-    setTimeout(() => showResult(lv2Score, lv2Words.length), 800);
+    setTimeout(() => showResult(lv2Score, lv2Total), 800);
   }
 }
 
@@ -813,10 +660,10 @@ function showResult(score, total) {
   document.getElementById('result-score').textContent = `${score}`;
   document.getElementById('result-total').textContent = `/ ${total} 정답`;
   document.getElementById('result-comment').textContent =
-    pct === 1     ? '완벽해! 전부 맞혔어 🎉' :
-    pct >= 0.75   ? '잘했어! 거의 다 맞혔네' :
-    pct >= 0.5    ? '절반 이상! 조금만 더 연습하면 돼' :
-                    '다시 한번 도전해보자!';
+    pct === 1   ? '완벽해! 전부 맞혔어 🎉' :
+    pct >= 0.75 ? '잘했어! 거의 다 맞혔네' :
+    pct >= 0.5  ? '절반 이상! 조금만 더 연습하면 돼' :
+                  '다시 한번 도전해보자!';
   showScreen('screen-result');
 }
 </script>
