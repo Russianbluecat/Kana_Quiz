@@ -14,7 +14,7 @@
     --border-med: rgba(0,0,0,0.18);
     --text-primary: #1A1A18;
     --text-secondary: #6B6A64;
-    --text-tertiary: #ADAG9F;
+    --text-tertiary: #ADA99F; /* 오타 수정: #ADAG9F -> #ADA99F */
     --blue-fill: #E6F1FB;
     --blue-border: #378ADD;
     --blue-dark: #0C447C;
@@ -316,7 +316,6 @@
 </head>
 <body>
 
-<!-- ── 시작 화면 ── -->
 <div id="screen-start" class="screen active">
   <div class="start-logo">
     <div class="jp">かな</div>
@@ -356,9 +355,7 @@
   <button class="start-btn" id="start-btn" disabled onclick="startQuiz()">시작하기</button>
 </div>
 
-<!-- ── 레벨 1 화면 ── -->
 <div id="screen-lv1" class="screen lv1-screen">
-  <!-- 스크롤 영역: 헤더 + 표 -->
   <div class="lv1-scroll">
     <button class="back-btn" onclick="goHome()">← 처음으로</button>
     <div class="quiz-header">
@@ -376,7 +373,6 @@
     <div class="table-area" id="lv1-table"></div>
   </div>
 
-  <!-- 하단 고정: 보기 버튼 -->
   <div class="lv1-bottom">
     <div class="feedback" id="lv1-feedback"></div>
     <div class="choices-grid" id="lv1-choices"></div>
@@ -386,7 +382,6 @@
   </div>
 </div>
 
-<!-- ── 레벨 2 화면 ── -->
 <div id="screen-lv2" class="screen">
   <button class="back-btn" onclick="goHome()">← 처음으로</button>
   <div class="quiz-header">
@@ -413,7 +408,6 @@
   </div>
 </div>
 
-<!-- ── 결과 화면 ── -->
 <div id="screen-result" class="screen">
   <div class="result-wrap">
     <div class="result-score" id="result-score"></div>
@@ -433,11 +427,11 @@ const HIRA_ROWS = [
   { label:'か행', cells:['か','き','く','け','こ'], roman:['ka','ki','ku','ke','ko'] },
   { label:'さ행', cells:['さ','し','す','せ','そ'], roman:['sa','shi','su','se','so'] },
   { label:'た행', cells:['た','ち','つ','て','と'], roman:['ta','chi','tsu','te','to'] },
-  { label:'な행', cells:['な','に','ぬ','ね','の'], roman:['na','ni','nu','ne','no'] },
+  { label:'な행', cells:['な','に','ぬ','ね','노'], roman:['na','ni','nu','ne','no'] },
   { label:'は행', cells:['は','ひ','ふ','へ','ほ'], roman:['ha','hi','fu','he','ho'] },
-  { label:'ま행', cells:['ま','み','む','め','も'], roman:['ma','mi','mu','me','mo'] },
+  { label:'ま행', cells:['ま','み','む','め','も'], roman:['ma','み','mu','me','mo'] },
   { label:'や행', cells:['や','','ゆ','','よ'], roman:['ya','','yu','','yo'] },
-  { label:'ら행', cells:['ら','り','る','れ','ろ'], roman:['ra','ri','ru','re','ro'] },
+  { label:'ら행', cells:['ら','り','루','れ','ろ'], roman:['ra','ri','ru','re','ro'] },
   { label:'わ행', cells:['わ','','を','','ん'], roman:['wa','','wo','','n'] },
 ];
 const KATA_ROWS = [
@@ -453,27 +447,33 @@ const KATA_ROWS = [
   { label:'ワ행', cells:['ワ','','ヲ','','ン'], roman:['wa','','wo','','n'] },
 ];
 
-// ── 구글 시트 설정 ──
 const SHEET_ID  = '1F-MzECDTU_S_6lR6_FJLpXOAih4Kg1SjHTCUeqgzOqo';
 const SHEET_NAME = 'Kana_Quiz';
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
-// 전체 단어 풀 (시트에서 로드)
 let ALL_HIRA_WORDS = [];
 let ALL_KATA_WORDS = [];
 let wordsLoaded = false;
 
 const TOTAL_BLANKS = 8;
-const TOTAL_WORDS  = 10; // 한 세션에 출제할 단어 수
+const TOTAL_WORDS  = 10;
 
-// ── 상태 ──
 let selectedKana = null, selectedLevel = null;
 let lv1Blanks = [], lv1Current = 0, lv1Score = 0, lv1Answered = false;
 let lv2Order  = [], lv2Current = 0, lv2Score = 0, lv2Answered = false;
-let lv2Words  = []; // 이번 세션 단어 목록
+let lv2Words  = []; 
 let currentRows = [], currentAllChars = [];
 
-// ── CSV 파싱 ──
+// Fisher-Yates 무작위 셔플 알고리즘 적용
+function shuffle(array) {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 function parseCSV(text) {
   const lines = text.trim().split('\n');
   const rows = [];
@@ -498,7 +498,10 @@ async function loadWords() {
     if (!res.ok) throw new Error('fetch failed');
     const text = await res.text();
     const rows = parseCSV(text);
-    // 헤더 행 제거 (단어, 로마자, 한국어 읽기, 뜻, 분류)
+    
+    ALL_HIRA_WORDS = [];
+    ALL_KATA_WORDS = [];
+
     for (let i = 1; i < rows.length; i++) {
       const [word, reading, kor_reading, meaning, type] = rows[i];
       if (!word || !reading || !type) continue;
@@ -514,8 +517,6 @@ async function loadWords() {
   }
 }
 
-function shuffle(a) { return [...a].sort(() => Math.random() - 0.5); }
-
 function showLoading(msg) {
   document.getElementById('start-btn').disabled = true;
   document.getElementById('start-btn').textContent = msg;
@@ -525,7 +526,6 @@ function hideLoading() {
   checkStartReady();
 }
 
-// ── 시작화면 ──
 function selectKana(k) {
   selectedKana = k;
   document.getElementById('btn-hira').classList.toggle('selected', k === 'hira');
@@ -602,9 +602,7 @@ function initLv1() {
 
 function renderColHeaders() {
   const el = document.getElementById('lv1-col-headers');
-  el.innerHTML = ['a','i','u','e','o'].map(c =>
-    `<div class="col-h">${c}</div>`
-  ).join('');
+  el.innerHTML = ['a','i','u','e','o'].map(c => `<div class="col-h">${c}</div>`).join('');
 }
 
 function renderLv1Table() {
@@ -652,7 +650,8 @@ function renderLv1Table() {
 function renderLv1Choices() {
   const b = lv1Blanks[lv1Current];
   const correct = b.char;
-  const wrong = shuffle(currentAllChars.filter(c => c !== correct)).slice(0, 3);
+  // 공백 문자 필터링 보강
+  const wrong = shuffle(currentAllChars.filter(c => c !== correct && c !== '')).slice(0, 3);
   const opts = shuffle([correct, ...wrong]);
 
   const area = document.getElementById('lv1-choices');
@@ -669,7 +668,6 @@ function renderLv1Choices() {
     `${lv1Current + 1}번 칸에 들어갈 문자를 고르세요 (${lv1Current + 1} / ${TOTAL_BLANKS})`;
   document.getElementById('lv1-feedback').textContent = '';
   document.getElementById('lv1-feedback').style.color = '';
-  document.getElementById('lv1-meaning').style.display = 'none';
   document.getElementById('lv1-next').style.display = 'none';
   lv1Answered = false;
 }
@@ -722,16 +720,15 @@ function lv1Next() {
 // ── 레벨 2 ──
 function initLv2() {
   const pool = selectedKana === 'hira' ? ALL_HIRA_WORDS : ALL_KATA_WORDS;
-  // 풀에서 랜덤 TOTAL_WORDS개 뽑기
-  lv2Words   = shuffle([...pool]).slice(0, TOTAL_WORDS);
+  lv2Words   = shuffle([...pool]).slice(0, Math.min(TOTAL_WORDS, pool.length));
   lv2Order   = lv2Words.map((_, i) => i);
   lv2Current = 0;
-  lv2Score   = 0;
+  lv2Score    = 0;
   lv2Answered = false;
 
   const kanaLabel = selectedKana === 'hira' ? '히라가나' : '가타카나';
   document.getElementById('lv2-badge').textContent = kanaLabel;
-  document.getElementById('lv2-score').textContent = `0 / ${TOTAL_WORDS}`;
+  document.getElementById('lv2-score').textContent = `0 / ${lv2Words.length}`;
   document.getElementById('lv2-pbar').style.width = '0%';
 
   renderLv2Question();
@@ -751,11 +748,18 @@ function renderLv2Question() {
   document.getElementById('lv2-next').style.display = 'none';
   lv2Answered = false;
 
-  // 오답 3개: 풀에서 정답 제외하고 랜덤 뽑기
   const correct = w.reading;
-  const wrongPool = pool.filter(x => x.reading !== correct);
-  const wrongOpts = shuffle(wrongPool).slice(0, 3).map(x => x.reading);
-  const opts = shuffle([correct, ...wrongOpts]);
+  
+  // 고유한 발음 세트를 활용하여 중복 보기 방지 로직 고도화
+  const wrongSet = new Set();
+  const shuffledPool = shuffle(pool);
+  for (let i = 0; i < shuffledPool.length; i++) {
+    if (shuffledPool[i].reading !== correct) {
+      wrongSet.add(shuffledPool[i].reading);
+    }
+    if (wrongSet.size === 3) break;
+  }
+  const opts = shuffle([correct, ...Array.from(wrongSet)]);
 
   const area = document.getElementById('lv2-choices');
   area.innerHTML = '';
@@ -788,16 +792,13 @@ function checkLv2(chosen, correct, meaning, btn) {
     fb.style.color = '#791F1F';
   }
 
-  const mbox = document.getElementById('lv2-meaning');
-  mbox.style.display = 'none';
+  document.getElementById('lv2-score').textContent = `${lv2Score} / ${lv2Words.length}`;
+  document.getElementById('lv2-pbar').style.width = `${((lv2Current + 1) / lv2Words.length) * 100}%`;
 
-  document.getElementById('lv2-score').textContent = `${lv2Score} / ${TOTAL_WORDS}`;
-  document.getElementById('lv2-pbar').style.width = `${((lv2Current + 1) / TOTAL_WORDS) * 100}%`;
-
-  if (lv2Current < TOTAL_WORDS - 1) {
+  if (lv2Current < lv2Words.length - 1) {
     document.getElementById('lv2-next').style.display = 'block';
   } else {
-    setTimeout(() => showResult(lv2Score, TOTAL_WORDS), 800);
+    setTimeout(() => showResult(lv2Score, lv2Words.length), 800);
   }
 }
 
