@@ -25,6 +25,8 @@
     --red-fill: #FCEBEB;
     --red-border: #E24B4A;
     --red-dark: #791F1F;
+    /* FIX 7: JS로 측정한 실제 뷰포트 높이를 담을 변수. 초기값은 100vh fallback */
+    --app-height: 100vh;
   }
 
   body {
@@ -119,9 +121,22 @@
   .num-badge.inactive { color: #85B7EB; }
 
   /* ── 레벨 1: 고정 레이아웃 ── */
-  .lv1-screen { flex-direction: column; height: 100vh; max-width: 560px; width: 100%; position: fixed; top: 0; left: 50%; transform: translateX(-50%); }
-  .lv1-scroll { flex: 1; overflow-y: auto; padding: 1.5rem 1.5rem 0.5rem; }
-  .lv1-bottom { flex-shrink: 0; background: var(--bg); border-top: 0.5px solid var(--border); padding: 1rem 1.5rem 1.5rem; }
+  /* FIX 7: 100vh → var(--app-height) 사용. JS가 실제 뷰포트 높이를 측정해서 채워줌
+     (100dvh를 지원하는 브라우저는 dvh를 기본값으로, 아니라면 JS 계산값을 사용) */
+  .lv1-screen {
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    height: var(--app-height);
+    max-width: 560px;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .lv1-scroll { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 1.5rem 1.5rem 0.5rem; }
+  .lv1-bottom { flex-shrink: 0; background: var(--bg); border-top: 0.5px solid var(--border); padding: 1rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom, 0px)); }
   .question-prompt {
     font-size: 15px; font-weight: 600; color: var(--blue-dark);
     background: var(--blue-fill); border-left: 3px solid var(--blue-mid);
@@ -271,6 +286,20 @@
 </div>
 
 <script>
+// ── FIX 7: 모바일 브라우저(특히 카카오톡 인앱 브라우저 등 dvh 미지원 환경) 대응 ──
+// 실제 보이는 뷰포트 높이를 측정해서 --app-height CSS 변수로 반영.
+// 주소창/툴바가 보이거나 사라질 때(resize, orientationchange)마다 다시 계산.
+function setAppHeight() {
+  const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  document.documentElement.style.setProperty('--app-height', `${h}px`);
+}
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
+window.addEventListener('orientationchange', setAppHeight);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', setAppHeight);
+}
+
 // ── 데이터 ──
 const HIRA_ROWS = [
   { label:'あ행', cells:['あ','い','う','え','お'], roman:['a','i','u','e','o'] },
@@ -445,6 +474,7 @@ function initLv1() {
   renderLv1Table();
   renderLv1Choices();
   showScreen('screen-lv1');
+  setAppHeight(); // FIX 7: 화면 진입 시 한번 더 보정
 }
 
 function renderColHeaders() {
